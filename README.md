@@ -4,10 +4,10 @@ Pocket Arcade ist eine Angular-Webseite für lokale Game-Boy-, Game-Boy-Advance-
 
 ## Starten
 
-\`\`\`sh
+```sh
 npm install
 npm start
-\`\`\`
+```
 
 Der Entwicklungsserver startet die App.
 
@@ -15,10 +15,10 @@ Der Entwicklungsserver startet die App.
 
 Erzeuge einen Produktionsbuild und starte anschließend die statische Vorschau:
 
-\`\`\`sh
+```sh
 npm run build
 npm run preview
-\`\`\`
+```
 
 Öffne danach [http://127.0.0.1:4300](http://127.0.0.1:4300).
 
@@ -40,11 +40,11 @@ Die installierbare PWA speichert App-Dateien und EmulatorJS-Ressourcen im Offlin
 
 | Dateiendung | System |
 | --- | --- |
-| \`.gb\`, \`.gbc\` | Game Boy / Game Boy Color |
-| \`.gba\` | Game Boy Advance |
-| \`.nds\` | Nintendo DS |
-| \`.3ds\`, \`.cci\`, \`.cxi\` | Nintendo 3DS über den EmulatorJS-/Azahar-Core |
-| \`.zip\` | Archiv mit einer oder mehreren unterstützten ROM-Dateien |
+| `.gb\`, `.gbc\` | Game Boy / Game Boy Color |
+| `.gba\` | Game Boy Advance |
+| `.nds\` | Nintendo DS |
+| `.3ds\`, `.cci\`, `.cxi\` | Nintendo 3DS über den EmulatorJS-/Azahar-Core |
+| `.zip\` | Archiv mit einer oder mehreren unterstützten ROM-Dateien |
 
 ## ROM-Prüfung und Kompatibilität
 
