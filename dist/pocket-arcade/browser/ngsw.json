@@ -1,0 +1,62 @@
+{
+  "configVersion": 1,
+  "timestamp": 1792570006972,
+  "index": "/index.html",
+  "assetGroups": [
+    {
+      "name": "app-shell",
+      "installMode": "prefetch",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "/icons/icon.svg",
+        "/index.html",
+        "/main-EZR3MEGJ.js",
+        "/manifest.webmanifest",
+        "/styles-WZSNTANF.css"
+      ],
+      "patterns": []
+    },
+    {
+      "name": "emulatorjs-runtime",
+      "installMode": "lazy",
+      "updateMode": "lazy",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [],
+      "patterns": [
+        "https:\\/\\/cdn\\.emulatorjs\\.org\\/stable\\/data\\/.*"
+      ]
+    }
+  ],
+  "dataGroups": [],
+  "hashTable": {
+    "/icons/icon.svg": "239d8cab3544f1c2d6106a822947507f5614cfde",
+    "/index.html": "d009710d02a5427f6ca237f41985350884d4f271",
+    "/main-EZR3MEGJ.js": "29211d4a5960fd00f283fe4260e4da2789ac5c2c",
+    "/manifest.webmanifest": "d04c82ff9d5272fb48390ce58eed45b5dff37db1",
+    "/styles-WZSNTANF.css": "de6d174643278a3335773aaee208c78655d74d65"
+  },
+  "navigationUrls": [
+    {
+      "positive": true,
+      "regex": "^\\/.*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*\\.[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*\\/.*$"
+    }
+  ],
+  "navigationRequestStrategy": "performance"
+}

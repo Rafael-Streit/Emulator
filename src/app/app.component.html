@@ -1,0 +1,136 @@
+<div class="app-shell">
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="Pocket Arcade Startseite"><span class="brand-mark"><span></span><span></span><span></span><span></span></span><span>pocket<span class="brand-light">arcade</span></span></a>
+    <div class="top-meta"><span class="live-dot"></span> DEIN BROWSER · DEIN SPIEL</div>
+    <nav class="top-actions">
+      <button class="nav-button" [class.selected]="!isLibraryOpen" (click)="openArcade()">ARCADE</button>
+      <button class="nav-button" [class.selected]="isLibraryOpen" (click)="openLibrary()">BIBLIOTHEK <span class="count">{{ games.length }}</span></button>
+      <button class="icon-action" type="button" (click)="isSettingsOpen=true" aria-label="Einstellungen">⚙</button>
+      @if (isPlaying) { <button class="about-button" type="button" (click)="toggleFullscreen()">⛶ <span>{{ isFullscreen ? 'ZURÜCK' : 'VOLLBILD' }}</span></button> }
+      @if (installAvailable) { <button class="about-button install-button" type="button" (click)="installApp()">＋ <span>INSTALLIEREN</span></button> }
+    </nav>
+  </header>
+
+  <main>
+    <section class="intro">
+      <div class="eyebrow"><span class="eyebrow-line"></span> DIE RETRO-ARCADE FÜR ÜBERALL</div>
+      <h1>Deine Spiele.<br><span>Dein kleines Comeback.</span></h1>
+      <p class="intro-copy">Lade dein eigenes Spiel und leg los. Vier Handheld-Generationen, ein Browser, null Umwege.</p>
+      @if (games.length) { <button class="resume-button" (click)="resumeMostRecent()">LETZTES SPIEL FORTSETZEN　▶</button> }
+    </section>
+
+    <section class="console-layout" aria-label="Emulator">
+      <div>
+        <div class="console" [class.dual-screen-console]="activeGame?.system === 'nds' || activeGame?.system === '3ds'" [class.three-ds-console]="activeGame?.system === '3ds'">
+          <div class="console-topline"><span>POCKET ARCADE <i>®</i></span><span class="power"><i></i> POWER</span></div>
+          <div class="screen-frame"><div #screenBezel class="screen-bezel" [class.aspect-wide]="aspectRatio === '16:9'">
+            @if (!isPlaying) {
+              <div class="screen-empty"><div class="screen-sun">✳</div><div class="screen-title">READY PLAYER ONE?</div><p>Dein nächstes Abenteuer wartet.</p><label class="screen-load" for="rom-upload"><span>SPIEL LADEN</span><b>＋</b></label><div class="screen-hint">GB · GBC · GBA · NDS · 3DS</div></div>
+            }
+            <iframe #playerFrame title="Spiel-Emulator" [class.hidden]="!isPlaying" allow="autoplay; fullscreen; gamepad; picture-in-picture" sandbox="allow-scripts allow-same-origin allow-pointer-lock" class="player-frame"></iframe>
+            @if (isPlaying) {
+              <button class="screen-toolbar-toggle" type="button" (click)="toggleEjsToolbar()" [class.active]="showEjsToolbar" [attr.aria-pressed]="showEjsToolbar" [attr.aria-label]="showEjsToolbar ? 'EmulatorJS-Leiste ausblenden' : 'EmulatorJS-Leiste anzeigen'" [title]="showEjsToolbar ? 'EmulatorJS-Leiste ausblenden' : 'EmulatorJS-Leiste anzeigen'">☷</button>
+              <button class="screen-fullscreen" type="button" (click)="toggleFullscreen()" [attr.aria-label]="isFullscreen ? 'Vollbild verlassen' : 'Spiel im Vollbild anzeigen'" [title]="isFullscreen ? 'Vollbild verlassen' : 'Vollbild'"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M21 16v5h-5M3 16v5h5"/></svg></button>
+            }
+          </div></div>
+          <div class="console-bottom"><div class="dpad" aria-hidden="true"><span class="up"></span><span class="right"></span><span class="down"></span><span class="left"></span><span class="center"></span></div><div class="center-controls"><button tabindex="-1">SELECT</button><button tabindex="-1">START</button></div><div class="action-buttons" aria-hidden="true"><span>B</span><span>A</span></div></div>
+          <div class="console-speaker"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        </div>
+        @if (isPlaying && activeGame) {
+          <div class="play-dock">
+            <div class="dock-game"><span class="era-dot green"></span><div><strong>{{ selectedName }}</strong><small>{{ gameSystem(selectedSystem) }} · CRC32 {{ checksum }}</small></div></div>
+            <button class="dock-button" (click)="openStates()">💾 <span>SAVE-STATES</span></button>
+            <button class="dock-button" (click)="toggleFullscreen()">⛶ <span>VOLLBILD</span></button><button class="dock-button" (click)="closeGame()">× <span>SCHLIESSEN</span></button>
+            @if (selectedSystem === 'nds' || selectedSystem === '3ds') { <button class="touch-toggle" type="button" [class.active]="dsLayout === 'touch'" [attr.aria-pressed]="dsLayout === 'touch'" (click)="toggleTouchLayout()"><span class="touch-toggle-icon">◎</span><span class="touch-toggle-copy"><strong>TOUCHSCREEN</strong><small>{{ dsLayout === 'touch' ? 'FOKUS AKTIV · ANTIPPEN' : 'ANTIPPEN ZUM FOKUSSIEREN' }}</small></span><span class="touch-toggle-state">{{ dsLayout === 'touch' ? 'AN' : '↗' }}</span></button> }
+          </div>
+        }
+      </div>
+
+      <aside class="side-panel">
+        <div class="panel-heading"><span>01 / SYSTEM WÄHLEN</span><span class="tiny-star">✳</span></div>
+        <div class="system-list">
+          @for (system of systems; track system.id) {
+            <button class="system-card" [class.active]="selectedSystem === system.id" type="button" (click)="selectedSystem = system.id">
+              <span class="system-icon" [class.ds-icon]="system.id === 'nds' || system.id === '3ds'">{{ system.id === 'gb' ? '▣' : system.id === 'gba' ? '▰' : system.id === '3ds' ? '▥' : '▤' }}</span><span class="system-copy"><strong>{{ system.name }}</strong><small>{{ system.detail }}</small></span><span class="system-number">{{ system.chip }}</span>
+            </button>
+          }
+        </div>
+        <div class="load-card" [class.drag-active]="isFileDragging" (dragenter)="onFileDragEnter($event)" (dragover)="onFileDragOver($event)" (dragleave)="onFileDragLeave($event)" (drop)="onFileDrop($event)">
+          @if (isFileDragging) { <div class="drop-overlay"><span>↓</span><strong>SPIEL HIER ABLEGEN</strong><small>ROM oder ZIP wird lokal geprüft</small></div> }
+          <div class="load-card-head"><span>02 / SPIEL LADEN</span><span>↘</span></div><p>Wähle eine Spieldatei. Nach der Prüfung erscheint sie in deiner Bibliothek.</p>
+          <label class="upload-button" for="rom-upload"><span>DATEI AUSWÄHLEN</span><span>＋</span></label><input id="rom-upload" type="file" accept=".gb,.gbc,.gba,.nds,.3ds,.cci,.cxi,.zip,application/zip" (change)="onFileSelected($event)">
+          <div class="rom-formats" aria-label="Unterstützte Systeme"><span>GB</span><span>GBC</span><span>GBA</span><span>DS</span><span>3DS</span></div>
+          @if (activeGame) { <div class="file-name">♫ &nbsp; {{ selectedName }}</div> }
+          @if (errorMessage) { <div class="error-message" role="alert">{{ errorMessage }}</div> }
+          @if (successMessage) { <div class="success-message" role="status">{{ successMessage }}</div> }
+          @if (checksum) { <div class="rom-valid"><span>✓ HEADER GEPRÜFT</span><code>CRC32 {{ checksum }}</code></div> }
+          <div class="privacy"><span class="lock">⌑</span> ROM und Spielstände bleiben lokal.</div>
+        </div>
+        <button class="key-hint settings-link" (click)="isSettingsOpen=true"><span>⌨</span><div><strong>STEUERUNG & DARSTELLUNG</strong><small>Tasten · Controller · Filter · DS-Touch</small></div><b>↗</b></button>
+      </aside>
+    </section>
+
+    @if (isLibraryOpen) {
+      <section class="library-section">
+        <div class="section-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> DEINE SAMMLUNG</div><h2>Spielebibliothek<span>.</span></h2></div><label class="upload-button compact-upload" for="rom-upload"><span>＋ SPIEL HINZUFÜGEN</span></label></div>
+        @if (games.length === 0) {
+          <div class="library-empty"><div class="screen-sun">✳</div><strong>Hier ist noch Platz für Klassiker.</strong><p>Füge eigene GB-, GBA- oder DS-ROMs hinzu. Sie bleiben in diesem Browser gespeichert.</p><label class="upload-button" for="rom-upload">ERSTES SPIEL LADEN　＋</label></div>
+        } @else {
+          <div class="library-grid">
+            @for (game of games; track game.id) {
+              <article class="game-card">
+                <div class="game-art" [class.art-gba]="game.system==='gba'" [class.art-nds]="game.system==='nds'" [class.art-3ds]="game.system==='3ds'">@if(game.coverData){<img class="cover-image" [src]="game.coverData" alt="Cover für {{ game.name }}">}@else{<span>{{ game.system==='gb'?'▣':game.system==='gba'?'▰':game.system==='3ds'?'▥':'▤' }}</span>}<small>{{ gameSystem(game.system) }}</small><label class="cover-edit" [for]="'cover-'+game.id">{{game.coverData?'COVER ÄNDERN':'COVER HINZUFÜGEN'}}</label><input class="hidden-input" [id]="'cover-'+game.id" type="file" accept="image/*" (change)="onCoverSelected(game,$event)"></div>
+                <div class="game-info">
+                  @if (renameId===game.id) { <div class="rename-row"><input [(value)]="renameDraft" (input)="renameDraft=$any($event.target).value" (keydown.enter)="renameGame(game)" aria-label="Spielname"><button (click)="renameGame(game)">OK</button></div> }
+                  @else { <h3>{{ game.name }}</h3> }
+                  <div class="game-meta"><span>{{ formatSize(game.size) }}</span><span>CRC32 {{ game.checksum }}</span></div>
+                  <div class="game-meta"><span>Zuletzt {{ game.lastPlayedAt ? formatDate(game.lastPlayedAt) : 'noch nie' }}</span><span>{{ formatPlayTime(game.playSeconds) }} gespielt</span></div>
+                  <div class="game-actions"><button class="play-button" (click)="playGame(game)">{{ game.lastPlayedAt ? 'FORTSETZEN' : 'SPIELEN' }}　▶</button><button class="text-button" (click)="startRename(game)" title="Umbenennen">✎</button><button class="text-button danger" (click)="deleteGame(game)" title="Aus Bibliothek löschen">×</button><button class="text-button" (click)="openGameStates(game)" title="Speicherstände">💾</button></div>
+                </div>
+              </article>
+            }
+          </div>
+        }
+      </section>
+    } @else {
+      <section class="systems-footer"><div class="footer-label">EINE ARCADE.<br><span>VIER ÄREN.</span></div><div class="era"><span class="era-dot green"></span><div><strong>GAME BOY</strong><small>Das Original · 1989</small></div></div><div class="era"><span class="era-dot coral"></span><div><strong>ADVANCE</strong><small>Mehr Farbe · 2001</small></div></div><div class="era"><span class="era-dot yellow"></span><div><strong>NINTENDO DS</strong><small>Zwei Bildschirme · 2004</small></div></div><div class="era"><span class="era-dot violet"></span><div><strong>NINTENDO 3DS</strong><small>3D-Handheld · 2011</small></div></div><div class="footer-note">GUTE SPIELE<br>WERDEN NIE ALT <span>✳</span></div></section>
+    }
+  </main>
+  <footer><span>© POCKET ARCADE</span><span>GEMACHT FÜR DIE NOSTALGIE <i>♥</i></span><span>ROM-DATEIEN NICHT ENTHALTEN</span></footer>
+
+  @if (isStatesOpen && activeGame) {
+    <div class="modal-backdrop" (click)="isStatesOpen=false"><section class="modal-card state-modal" (click)="$event.stopPropagation()">
+      <div class="modal-head"><div><div class="eyebrow">SPEICHERPLÄTZE · {{ activeGame.name }}</div><h2>Dein Fortschritt<span>.</span></h2></div><button class="close-modal" (click)="isStatesOpen=false">×</button></div>
+      <p class="modal-copy">Speichere bis zu drei Zustände im Browser oder exportiere sie als Datei.</p>
+      <div class="slot-list">
+        @for (slot of [1,2,3]; track slot) {
+          <article class="slot-card" [class.slot-filled]="stateForSlot(slot)">
+            @if (stateForSlot(slot)?.screenshot) { <img class="slot-shot" [src]="stateForSlot(slot)?.screenshot" alt="Save-State Vorschau"> } @else { <div class="slot-shot empty-shot">SLOT {{ slot }}</div> }
+            <div class="slot-details"><strong>SLOT {{ slot }}</strong><small>{{ stateForSlot(slot) ? formatDate(stateForSlot(slot)!.savedAt) : 'Noch leer' }}</small>
+              <div class="slot-actions"><button class="small-primary" [disabled]="!isPlaying || !emulatorReady" (click)="saveState(slot)">JETZT SPEICHERN</button>@if(stateForSlot(slot)){<button (click)="loadState(slot)">LADEN</button><button (click)="exportState(slot)">EXPORT</button><button class="danger" (click)="deleteState(stateForSlot(slot)!)">×</button>}<button (click)="triggerStateImport(slot)">IMPORT</button></div>
+            </div>
+          </article>
+        }
+      </div>
+      <input #stateImport class="hidden-input" type="file" accept=".state" (change)="importStateFile($event)">
+      <div class="modal-status">{{ settingsStatus }}</div>
+    </section></div>
+  }
+
+  @if (isSettingsOpen) {
+    <div class="modal-backdrop" (click)="isSettingsOpen=false"><section class="modal-card settings-modal" (click)="$event.stopPropagation()">
+      <div class="modal-head"><div><div class="eyebrow">PERSÖNLICH EINSTELLEN</div><h2>Dein Setup<span>.</span></h2></div><button class="close-modal" (click)="isSettingsOpen=false">×</button></div>
+      <div class="setting-row"><div><strong>Steuerung</strong><small>USB-/Bluetooth-Gamepad oder Tastaturbelegung ändern</small></div><select [value]="controlPreset" (change)="setControls($any($event.target).value)"><option value="classic">Pfeile + Z/X</option><option value="wasd">WASD + J/K</option><option value="custom">Eigene Tasten</option></select></div>
+      @if (controlPreset === 'custom') { <div class="mapping-grid">@for (binding of keyBindings; track binding.id) { <label>{{ binding.label }}<input readonly [value]="customKeys[binding.id]" (keydown)="setCustomKey(binding.id, $event)" aria-label="Taste für {{ binding.label }} festlegen"></label> }</div> }
+      <div class="setting-row"><div><strong>Bildfilter</strong><small>Pixelig, weich oder satte Farben</small></div><select [value]="filterMode" (change)="setFilter($any($event.target).value)"><option value="pixel">Pixel perfekt</option><option value="soft">Weich</option><option value="crt">CRT-Farben</option></select></div>
+      <div class="setting-row"><div><strong>Bildformat</strong><small>Automatisch im Emulator, oder Bildschirm füllen</small></div><select [value]="aspectRatio" (change)="setAspect($any($event.target).value)"><option value="4:3">Klassisch 4:3</option><option value="16:9">Breit 16:9</option></select></div>
+      <div class="setting-row"><div><strong>DS-/3DS-Anzeige</strong><small>Beide Bildschirme, oberer Screen oder Touchscreen-Fokus</small></div><select [value]="dsLayout" (change)="setDsLayout($any($event.target).value)"><option value="stacked">Beide Screens</option><option value="top">Oberer Screen</option><option value="touch">Touchscreen-Fokus</option></select></div>
+      <div class="pwa-note">📱 <span><strong>Installieren & offline starten</strong><small>Nach dem ersten Online-Start werden App und Emulator-Dateien zwischengespeichert.</small></span><button class="small-primary" (click)="installApp()">INSTALLIEREN</button></div>
+      <div class="modal-status">{{ settingsStatus }}</div>
+    </section></div>
+  }
+</div>
+
+
+
+

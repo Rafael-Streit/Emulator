@@ -1,0 +1,11 @@
+{
+  "name": "Pocket Arcade",
+  "short_name": "Pocket Arcade",
+  "description": "Game Boy, Advance und DS direkt im Browser spielen.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#10120f",
+  "theme_color": "#10120f",
+  "icons": [{ "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}

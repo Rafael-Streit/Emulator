@@ -1,0 +1,20 @@
+{
+  "index": "/index.html",
+  "assetGroups": [
+    {
+      "name": "app-shell",
+      "installMode": "prefetch",
+      "resources": {
+        "files": ["/*.css", "/*.js", "/index.html", "/manifest.webmanifest", "/icons/*.svg"]
+      }
+    },
+    {
+      "name": "emulatorjs-runtime",
+      "installMode": "lazy",
+      "updateMode": "lazy",
+      "resources": {
+        "urls": ["https://cdn.emulatorjs.org/stable/data/**"]
+      }
+    }
+  ]
+}
